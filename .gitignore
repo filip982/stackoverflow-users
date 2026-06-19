@@ -31,3 +31,10 @@ core/rust/target/
 # Env / secrets
 .env
 *.env.local
+
+# Local AI tools (OpenCode / Cline)
+.opencode
+.opencode/opencode.db
+.opencode/opencode.db-shm
+.opencode/opencode.db-wal
+.clineignore
