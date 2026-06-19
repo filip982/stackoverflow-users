@@ -1,0 +1,56 @@
+name: StackOverflowUsers
+options:
+  bundleIdPrefix: com.filip982
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+packages:
+  Kingfisher:
+    url: https://github.com/onevcat/Kingfisher
+    from: "7.0.0"
+  swift-dependencies:
+    url: https://github.com/pointfreeco/swift-dependencies
+    from: "1.0.0"
+  Networking:
+    path: Packages/Networking
+  Persistence:
+    path: Packages/Persistence
+
+targets:
+  StackOverflowUsers:
+    type: application
+    platform: iOS
+    sources:
+      - path: StackOverflowUsers
+    resources:
+      - path: StackOverflowUsers/Resources/Assets.xcassets
+    dependencies:
+      - package: Kingfisher
+      - package: swift-dependencies
+        product: Dependencies
+      - package: Networking
+      - package: Persistence
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        INFOPLIST_FILE: StackOverflowUsers/Resources/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.filip982.stackoverflow-users
+        DEVELOPMENT_TEAM: ""
+
+  StackOverflowUsersTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: StackOverflowUsersTests
+    dependencies:
+      - target: StackOverflowUsers
+      - package: swift-dependencies
+        product: DependenciesTestSupport
+      - package: Networking
+      - package: Persistence
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
