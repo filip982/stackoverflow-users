@@ -1,0 +1,163 @@
+# CodeRabbit configuration for stackoverflow-users
+# iOS Swift project — SwiftUI, MVVM/MVI, SPM, Swift 6, iOS 17+
+# Schema: https://coderabbit.ai/integrations/schema.v2.json
+
+language: "en-US"
+
+reviews:
+  # assertive: covers bugs, security, style, naming, docs, and best-practices
+  profile: "assertive"
+
+  # Core PR summary features
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: false
+  sequence_diagrams: true
+  changed_files_summary: true
+
+  # Do not block merges via "request changes" automatically;
+  # let the team decide after reading the review.
+  request_changes_workflow: false
+
+  # Auto-review all non-draft PRs targeting develop
+  auto_review:
+    enabled: true
+    drafts: false
+    incremental_reviews: true
+    # Only auto-review PRs targeting the protected branch
+    base_branches:
+      - "develop"
+
+  # Global review instructions covering the entire codebase
+  instructions: |
+    This is an iOS app written in Swift 6 targeting iOS 17+.
+    It uses SwiftUI for the UI layer, the MVVM/MVI pattern with an
+    Action/State/send architecture, @Observable for state management,
+    @MainActor for UI work, and protocol-based dependency injection
+    via the swift-dependencies package (pointfreeco/swift-dependencies).
+    SPM local packages live under apps/ios/Packages/.
+
+    When reviewing any Swift file, enforce the following:
+
+    Swift 6 / Concurrency
+    - All UI-bound types and views must be annotated with @MainActor.
+    - Avoid crossing actor boundaries unsafely; prefer structured concurrency
+      (async/await, Task, TaskGroup) over callbacks or DispatchQueue.
+    - Flag any use of nonisolated(unsafe), @unchecked Sendable, or unstructured
+      Task {} blocks that capture mutable state without justification.
+    - Ensure Sendable conformances are correct and not trivially suppressed.
+
+    SwiftUI best practices
+    - Views must be lightweight value types; business logic belongs in
+      view models or reducers, not in View body properties.
+    - Avoid storing ObservableObject/StateObject where @Observable + @State
+      is the Swift 6 idiomatic alternative.
+    - Prefer @Binding and environment values over passing closures deep into
+      view hierarchies.
+    - Flag any @State that holds reference types without justification.
+    - Avoid recomputing expensive work inside body; use computed caches or
+      dedicated types.
+
+    Architecture (MVVM/MVI — Action/State/send pattern)
+    - Each feature must expose a single State value type, an Action enum, and
+      a send(_ action: Action) method (or equivalent reduce function).
+    - Reducers/ViewModels must be @Observable or ObservableObject — choose one
+      pattern consistently within a feature; flag mixing.
+    - Side effects must be isolated from pure State mutation.
+    - Protocol-based DI: concrete service types must not be imported directly
+      into feature modules — depend on protocols injected via @Dependency
+      (swift-dependencies).
+
+    Networking & Persistence (SPM packages)
+    - Networking requests must handle errors explicitly; no silent catch-all
+      ignoring errors.
+    - Persistence writes must run off the main actor unless justified.
+    - Both packages must expose their public API through protocols so features
+      can use DI-friendly test doubles.
+
+    General code quality
+    - No force-unwraps (!) in production code; use guard-let, if-let, or
+      structured error propagation.
+    - No magic numbers; use named constants or enums.
+    - Access control: prefer private/internal; flag any public that is not
+      part of a module's public API contract.
+    - Test files: assert meaningful behaviour, not just "no crash".
+
+  # Path-specific guidance on top of global instructions
+  path_instructions:
+    - path: "apps/ios/StackOverflowUsers/Features/**/*.swift"
+      instructions: |
+        Feature files. Each feature directory (UserList, UserDetail, SortOptions)
+        should contain exactly: a View, a ViewModel/Reducer (Action + State + send),
+        and optionally a sub-view. Flag any business logic leaked into View body.
+        Confirm @MainActor is on the ViewModel and that it uses @Dependency for
+        service injection rather than direct concrete types.
+
+    - path: "apps/ios/StackOverflowUsers/Domain/**/*.swift"
+      instructions: |
+        Domain layer: pure models and protocol definitions only.
+        No import of UIKit, SwiftUI, or Observation is acceptable here.
+        Structs must be Sendable. Flag classes unless there is a clear reason.
+
+    - path: "apps/ios/StackOverflowUsers/Services/**/*.swift"
+      instructions: |
+        Service implementations. Each service must conform to a protocol defined
+        in the Domain layer. Confirm @MainActor usage is appropriate (off-main
+        for I/O). Check that DependencyValues extensions register live, preview,
+        and test values for each service.
+
+    - path: "apps/ios/Packages/Networking/**/*.swift"
+      instructions: |
+        Networking SPM package. Verify URLSession usage is async/await based.
+        All public API must be protocol-backed. Check proper HTTP error handling
+        (status codes, decoding failures). Ensure no hardcoded URLs or secrets.
+
+    - path: "apps/ios/Packages/Persistence/**/*.swift"
+      instructions: |
+        Persistence SPM package. Verify that all write operations are performed
+        off the main actor. Public API must be protocol-backed and Sendable-safe.
+        Flag any synchronous disk I/O on @MainActor.
+
+    - path: "apps/ios/StackOverflowUsersTests/**/*.swift"
+      instructions: |
+        Unit tests. Ensure tests use DependencyValues overrides (withDependencies)
+        rather than real network/disk. Each test must assert a concrete outcome —
+        flag tests that only assert non-nil or "no crash". Prefer swift-dependencies
+        TestStore-style patterns if applicable.
+
+    - path: "apps/ios/**/*.xcodeproj/**"
+      instructions: |
+        Xcode project files. Only flag meaningful structural issues (duplicate
+        targets, missing file references). Ignore formatting-only differences.
+
+  # Exclude generated, binary, and lockfiles from review
+  path_filters:
+    - "!**/*.resolved"
+    - "!**/*.pbxproj"
+    - "!**/*.xcworkspacedata"
+    - "!**/*.xcuserstate"
+    - "!**/xcuserdata/**"
+    - "!**/DerivedData/**"
+    - "!**/.build/**"
+    - "!**/Assets.xcassets/**"
+    - "!apps/android/**"
+    - "!apps/rust/**"
+
+  # Enable static analysis tools available for Swift/YAML/Shell
+  tools:
+    swiftlint:
+      enabled: true
+    shellcheck:
+      enabled: true
+    yamllint:
+      enabled: true
+    markdownlint:
+      enabled: true
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  opt_out: false
+  learnings:
+    scope: "auto"
