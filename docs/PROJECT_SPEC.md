@@ -1,5 +1,10 @@
 # StackOverflow Users App — Project Spec
 
+> **Note:** This is the original requirements brief and is preserved unchanged for traceability.
+> Several technical decisions have been deliberately upgraded from what this spec mandates.
+> See [`docs/architecture.md`](architecture.md) for the authoritative implementation decisions
+> (SwiftUI instead of UIKit, Kingfisher + swift-dependencies, MVVM/MVI pattern, SPM local packages, XcodeGen).
+
 ## Overview
 An iOS app that fetches and displays StackOverflow users, with follow/unfollow, a detail view, and sorting.
 
