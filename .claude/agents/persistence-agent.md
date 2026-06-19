@@ -1,6 +1,6 @@
 ---
 name: persistence-agent
-description: Builds the persistence SPM package — FollowStoreProtocol and a UserDefaults-backed implementation for storing which users are followed. Use for anything about saving/loading follow status.
+description: Builds and maintains the Persistence SPM package — follow-state storage protocol, UserDefaults implementation, and in-memory mock. Use for anything about saving or loading local state across app launches.
 model: sonnet
 tools: Read, Write, Edit, Grep, Glob, Bash
 isolation: worktree
@@ -9,29 +9,23 @@ permissionMode: acceptEdits
 color: green
 ---
 
-You build ONLY the persistence layer. Work inside `apps/ios/Packages/Persistence/Sources/Persistence/`.
+You own the persistence data layer. Your workspace is `apps/ios/Packages/Persistence/`.
 
-Read `docs/architecture.md` before starting.
+Read `docs/architecture.md` before starting any task.
 
-## Deliverables
-- `FollowStoreProtocol`:
-  - `func isFollowed(userID: Int) -> Bool`
-  - `func setFollowed(_ followed: Bool, userID: Int)`
-  - `var allFollowedIDs: Set<Int> { get }`
-- `UserDefaultsFollowStore: FollowStoreProtocol` — stores a `Set<Int>` as `[Int]` in `UserDefaults`.
-  Accept a `UserDefaults` instance at init (default: `.standard`) for testability.
-- `InMemoryFollowStore: FollowStoreProtocol` — in-memory mock for tests and previews.
-- `Package.swift` declaring the `Persistence` library target and test target.
+## Role
+- Define protocols for any local state that must survive app restarts.
+- Implement those protocols using UserDefaults (or other appropriate on-device storage).
+- Provide in-memory mocks conforming to the same protocols for use in tests and previews.
 
 ## Constraints
-- Follow is local-only — NO API calls.
+- No API calls — persistence is local-only.
 - Swift only, no third-party frameworks.
-- Protocol-first so ViewModels inject it via `@Dependency` and tests use `InMemoryFollowStore`.
+- Accept storage backends (e.g. `UserDefaults`) at init so implementations are testable.
+- Protocol-first: ViewModels must be able to inject a mock without touching real storage.
 
-## Tests (required, in `Packages/Persistence/Tests/PersistenceTests/`)
-- Set followed → create new store instance with same `UserDefaults` suite → still followed.
-- Unfollow clears state.
-- `InMemoryFollowStore` tests are isolated (no real `UserDefaults`).
-- Use a named `UserDefaults` suite (`UserDefaults(suiteName: "PersistenceTests")`) — never `.standard`.
-
-Record the `FollowStoreProtocol` signature in project memory so `viewmodel-agent` binds to it correctly.
+## Working style
+- Write tests in `Packages/Persistence/Tests/PersistenceTests/`.
+- Always use a named `UserDefaults` suite in tests — never `.standard`.
+- Cover: write → read-back across instances, delete/clear, mock isolation.
+- After completing work, update project memory with the exact protocol signatures so other agents bind to them correctly.
