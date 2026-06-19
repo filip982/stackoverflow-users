@@ -1,15 +1,5 @@
 {
   "agent": "orchestrator",
-  "hooks": {
-    "SubagentStop": [
-      {
-        "matcher": "reviewer-agent",
-        "hooks": [
-          { "type": "command", "command": "./scripts/on-reviewer-stop.sh" }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "deny": []
   }

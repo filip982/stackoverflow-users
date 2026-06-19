@@ -1,0 +1,6 @@
+# All iOS code requires review from the project owner
+apps/ios/ @filip982
+
+# Architecture and agent config
+docs/ @filip982
+.claude/ @filip982

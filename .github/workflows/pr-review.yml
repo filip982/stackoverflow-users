@@ -1,0 +1,40 @@
+name: PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [develop]
+
+jobs:
+  code-review:
+    name: Claude Code Review
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run code review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          claude --print --dangerously-skip-permissions \
+            -p "$(cat .claude/agents/reviewer-agent.md)
+
+          Review the changes in this PR against our architecture in docs/architecture.md.
+          Post your findings as inline PR comments using the gh CLI.
+          End with VERDICT: APPROVED or VERDICT: CHANGES_REQUESTED with a BLOCKERS: list.
+
+          PR number: ${{ github.event.pull_request.number }}
+          Base branch: ${{ github.base_ref }}
+          Head branch: ${{ github.head_ref }}" \
+            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(gh pr review:*),Bash(gh pr comment:*),Read,Grep,Glob"
