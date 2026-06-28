@@ -1,5 +1,5 @@
 {
-  "agent": "orchestrator",
+  "agent": "tech-lead-agent",
   "permissions": {
     "deny": []
   }
