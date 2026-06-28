@@ -38,6 +38,8 @@ jobs:
       - name: Run orchestrator
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CLAUDE_CODE_DISABLE_TUI: "1"
+          NO_COLOR: "1"
         run: |
           claude --print \
             --allowedTools "Bash(git checkout:*),Bash(git push:*),Bash(git add:*),Bash(git commit:*),Bash(gh issue:*),Bash(gh pr create:*),Bash(gh pr comment:*),Read,Write,Edit,Glob,Grep,Agent" \
