@@ -93,7 +93,6 @@ fi
 echo "👀  Watching $REPO for issues labeled '$TRIGGER_LABEL'"
 echo "    Repo: $REPO_DIR"
 echo "    Polling every ${POLL_INTERVAL}s — Ctrl+C to stop"
-echo "    Tip: run './scripts/watch-issues.sh pm' to groom the backlog"
 echo ""
 
 while true; do
