@@ -54,7 +54,7 @@ run_tech_lead() {
   git checkout develop --quiet
   git pull origin develop --quiet
 
-  CLAUDE_CODE_DISABLE_TUI=1 NO_COLOR=1 claude --agent tech-lead-agent \
+  CLAUDE_CODE_DISABLE_TUI=1 NO_COLOR=1 claude --print --agent tech-lead-agent \
     --allowedTools "Bash(git checkout:*),Bash(git push:*),Bash(git add:*),Bash(git commit:*),Bash(gh issue:*),Bash(gh pr create:*),Bash(gh pr comment:*),Bash(gh pr view:*),Bash(git diff:*),Bash(git log:*),Read,Write,Edit,Glob,Grep,Agent" \
     -p "You are the tech lead for the StackOverflow Users iOS app.
 
