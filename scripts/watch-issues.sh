@@ -75,7 +75,7 @@ Instructions:
 7. Monitor the PR for VERDICT comments. Address CHANGES_REQUESTED by delegating fixes to the relevant worker.
 8. When VERDICT: APPROVED, post a summary comment on the PR and on issue #$NUM.
 
-Work in: $REPO_DIR (already on develop branch)."
+Work in: $REPO_DIR (already on develop branch)." </dev/null
 
   echo ""
   echo "✅  Tech lead finished for issue #$NUM"
