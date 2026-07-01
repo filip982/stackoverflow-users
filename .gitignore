@@ -32,9 +32,13 @@ core/rust/target/
 .env
 *.env.local
 
-# Local AI tools (OpenCode / Cline)
+# Local AI tools (OpenCode / Cline / Codex)
 .opencode
 .opencode/opencode.db
 .opencode/opencode.db-shm
 .opencode/opencode.db-wal
 .clineignore
+.codex/
+
+# Claude agent worktrees (ephemeral, never commit)
+.claude/worktrees/
